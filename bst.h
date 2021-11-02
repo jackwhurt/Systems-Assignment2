@@ -1,18 +1,23 @@
-#ifndef _BST_H_
-#define _BST_H_
+struct Node{
 
-typedef struct _Node Node;
+    int data;
+    struct Node *left;
+    struct Node *right;
 
-Node * insertNode(Node * root, int value);
+};
 
-Node * deleteNode(Node * root, int value);
+typedef struct Node Node;
 
-void printSubtree(Node * N);
+Node* insertNode(Node *root, int value);
 
-int countLeaves(Node * N);
+Node* freeSubtree(Node *N);
 
-Node * deleteSubtree(Node * root, int value);
+int countNodes(Node *N);
 
-int depth (Node * R, Node * N); 
+Node* deleteNode(Node* root, int value);
 
-#endif
+void printSubtree(Node *N);
+
+int sumSubtree(Node *N);
+
+Node* balanceTree(Node* root);

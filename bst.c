@@ -1,21 +1,14 @@
 #include<stdio.h>
-#include <assert.h>
 #include<stdlib.h>
+#include<string.h>
+#include <unistd.h>
 #include "bst.h"
-
-typedef struct _Node {
-
-    int value;
-    Node* left;
-    Node* right;
-
-} Node;
 
 //initialising a new node
 Node* createNode(int value) {
 
-    Node* newNode = (Node*)malloc(sizeof(struct _Node));
-    newNode -> value = value;
+    Node* newNode = (Node*)malloc(sizeof(struct Node));
+    newNode -> data = value;
     newNode -> left = NULL;
     newNode -> right = NULL;
     return newNode;
@@ -24,7 +17,7 @@ Node* createNode(int value) {
 
 Node* insertNode(Node *root, int value) {
 
-    //if the tree is empty assign the new node the int value and return it
+    //if the tree is empty assign the new node the int data and return it
     if(root == NULL) {
 
         //allocating memory for a new node
@@ -34,7 +27,7 @@ Node* insertNode(Node *root, int value) {
     }
 
     //recur down the tree until a node is found which has empty left or right pointers
-    if(root -> value > value) {
+    if(root -> data > value) {
 
         if(root -> left == NULL) {
 
@@ -48,7 +41,7 @@ Node* insertNode(Node *root, int value) {
 
         }
 
-    }else if(root -> value < value) {
+    }else if(root -> data < value) {
 
         if(root -> right == NULL) {
 
@@ -64,12 +57,12 @@ Node* insertNode(Node *root, int value) {
 
     }
 
-    //if the value already exists return null
+    //if the data already exists return null
     return NULL;
 
 }
 
-//recurs throughout the tree to check if a specificed value is present
+//recurs throughout the tree to check if a specificed data is present
 int isPresent(Node *root, int value) {
 
     if(root == NULL) {
@@ -78,7 +71,7 @@ int isPresent(Node *root, int value) {
 
     }
 
-    if(root -> value == value) {
+    if(root -> data == value) {
 
         return 1;
 
@@ -98,12 +91,12 @@ Node* deleteNode(Node *root, int value) {
 
     }
 
-    //recur down the tree until the value is found making sure to check there aren't any null pointers
-    if(root -> value > value) {
+    //recur down the tree until the data is found making sure to check there aren't any null pointers
+    if(root -> data > value) {
 
         root -> left = deleteNode(root -> left, value);
 
-    } else if(root -> value < value) {
+    } else if(root -> data < value) {
 
         root -> right = deleteNode(root -> right, value);
 
@@ -124,7 +117,7 @@ Node* deleteNode(Node *root, int value) {
 
         }
 
-        //if it has two, replace the node to delete with the smallest value on its right subtree
+        //if it has two, replace the node to delete with the smallest data on its right subtree
         Node* newNode = root -> right;
 
         do {
@@ -137,8 +130,8 @@ Node* deleteNode(Node *root, int value) {
 
         } while(newNode -> left != NULL);
 
-        root -> value = newNode -> value;
-        root -> right = deleteNode(root -> right, root -> value);
+        root -> data = newNode -> data;
+        root -> right = deleteNode(root -> right, root -> data);
 
     }
 
@@ -155,7 +148,7 @@ void printSubtree(Node *N) {
 
     }
 
-    printf("%d\n", N -> value);
+    printf("%d\n", N -> data);
 
     if(N -> right != NULL) {
 
@@ -185,7 +178,7 @@ int countLeaves(Node *N) {
 
 }
 
-//find the root value to delete and just free it from memory
+//find the root data to delete and just free it from memory
 Node* deleteSubtree(Node *root, int value) {
 
     if(root == NULL) {
@@ -194,11 +187,11 @@ Node* deleteSubtree(Node *root, int value) {
 
     }
 
-    if(root -> value > value) {
+    if(root -> data > value) {
 
         root -> left = deleteSubtree(root -> left, value);
 
-    } else if(root -> value < value) {
+    } else if(root -> data < value) {
 
         root -> right = deleteSubtree(root -> right, value);
 
@@ -217,7 +210,7 @@ Node* deleteSubtree(Node *root, int value) {
 //return depthCount
 int depth (Node *root, Node *N) {
 
-    if (!isPresent(root, N->value)) {
+    if (!isPresent(root, N->data)) {
 
         return -1;
 
@@ -232,7 +225,7 @@ int depth (Node *root, Node *N) {
     int depthLeft = depth(root->left, N);
     int depthRight = depth(root->right, N);
 
-    if (root->value > N->value) {
+    if (root->data > N->data) {
 
         return depthLeft + 1;
 
@@ -244,7 +237,8 @@ int depth (Node *root, Node *N) {
 
 }
 
-int countNodes (Node* N) {
+//this function counts all the nodes in the tree N
+int countNodes (Node *N) {
 
     if(N == NULL) {
 
@@ -259,14 +253,16 @@ int countNodes (Node* N) {
 
 }
 
+//linked list implementation
 typedef struct listNode {
 
     int value;
-    struct listNode* next;
+    struct listNode *next;
 
 } listNode;
 
-listNode* tail(listNode* node) {
+//tail function for linked list
+listNode* tail(listNode *node) {
 
     if(node == NULL) {
 
@@ -278,11 +274,12 @@ listNode* tail(listNode* node) {
 
 }
 
-listNode* append(listNode* leftHead, int value, listNode* rightHead) {
+//function to join together left, root and right
+listNode* append(listNode *leftHead, int value, listNode* rightHead) {
 
     if(leftHead == NULL && rightHead == NULL) {
 
-        listNode* middle = NULL;
+        listNode *middle = NULL;
         middle = (listNode*) malloc(sizeof(listNode));
         middle -> value = value;
         middle -> next = NULL;
@@ -293,7 +290,7 @@ listNode* append(listNode* leftHead, int value, listNode* rightHead) {
 
     if (leftHead == NULL) {
 
-        listNode* middle = NULL;
+        listNode *middle = NULL;
         middle = (listNode*) malloc(sizeof(listNode));
         middle -> value = value;
         middle -> next = rightHead;
@@ -318,7 +315,7 @@ listNode* append(listNode* leftHead, int value, listNode* rightHead) {
 
     if(leftHead != NULL && rightHead == NULL) {
 
-        listNode* middle = NULL;
+        listNode *middle = NULL;
         middle = (listNode*) malloc(sizeof(listNode));
         middle -> value = value;
         middle -> next = NULL;
@@ -329,7 +326,7 @@ listNode* append(listNode* leftHead, int value, listNode* rightHead) {
 
     }
 
-    listNode* middle = NULL;
+    listNode *middle = NULL;
     middle = (listNode*) malloc(sizeof(listNode));
     middle -> value = value;
     middle -> next = rightHead;
@@ -339,7 +336,8 @@ listNode* append(listNode* leftHead, int value, listNode* rightHead) {
 
 }
 
-listNode* inOrder(Node* node){
+//converts a tree into an inorder linked list
+listNode* inOrder(Node *node){
 
     if (node == NULL) {
 
@@ -347,21 +345,22 @@ listNode* inOrder(Node* node){
 
     }
 
-    listNode* leftList = NULL;
-    listNode* rightList = NULL;
+    listNode *leftList = NULL;
+    listNode *rightList = NULL;
 
     leftList = inOrder(node -> left);
     rightList = inOrder(node -> right);
 
-    listNode* head = NULL;
+    listNode *head = NULL;
 
-    head = append(leftList, node -> value, rightList);
+    head = append(leftList, node -> data, rightList);
 
     return head;
 
 }
 
-int getValue(listNode* listNode, int index) {
+//gets data at given index in a linked list
+int getValue(listNode *listNode, int index) {
 
     if(index == 0) {
 
@@ -375,7 +374,8 @@ int getValue(listNode* listNode, int index) {
 
 }
 
-Node* buildTree (listNode* listHead, int start, int end) {
+//builds a balanced tree from an in order linked list of values
+Node* buildTree (listNode *listHead, int start, int end) {
 
     if(start > end) {
 
@@ -385,7 +385,7 @@ Node* buildTree (listNode* listHead, int start, int end) {
 
     int middle = (start + end) / 2;
     int value = getValue(listHead, middle);
-    Node* root = createNode(value);
+    Node *root = createNode(value);
 
     root -> left = buildTree(listHead, start, middle - 1);
     root -> right = buildTree(listHead, middle + 1, end);
@@ -394,26 +394,46 @@ Node* buildTree (listNode* listHead, int start, int end) {
 
 }
 
-Node* balanceTree(Node* root) {
+//gets number of nodes in the tree, converts the tree into an in order linked list, then converts that into a balance tree
+Node* balanceTree(Node *root) {
 
     int nodeCount = countNodes(root);
-    listNode* listHead = inOrder(root);
-    Node* balancedRoot = buildTree(listHead, 0, nodeCount - 1);
+    listNode *listHead = inOrder(root);
+    Node *balancedRoot = buildTree(listHead, 0, nodeCount - 1);
 
     return balancedRoot;
 
 }
 
+int sumSubtree(Node *N) {
+
+    listNode *listHead = inOrder(N);
+    int nodeCount = countNodes(N);
+
+    int sum = 0;
+
+    for(int i = 0; i < nodeCount; i++) {
+
+        sum += listHead -> value;
+        listHead = tail(listHead);
+
+    }
+
+    free(listHead);
+    return sum;
+
+}
+
 int main() {
 
-    Node* myNodes[1001];
+    Node* myNodes[11];
     srand(0);
     Node* root = insertNode(NULL, 5);
 
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 12; i++) {
 
         int r = rand();
-        r = r % 1000;
+        r = r % 10;
 
         myNodes[i] =  insertNode(root, r);
 
@@ -421,6 +441,8 @@ int main() {
 
     Node* balancedRoot = balanceTree(root);
     printSubtree(root);
+    printSubtree(balancedRoot);
+    printf("Sum %d\n", sumSubtree(root));
 
 //    printf("Depth: %d\n", depth(root, myNodes[40]));
 //    printf("Count Leaves: %d\n", countLeaves(root));
