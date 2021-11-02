@@ -244,13 +244,171 @@ int depth (Node *root, Node *N) {
 
 }
 
+int countNodes (Node* N) {
 
+    if(N == NULL) {
 
-void main() {
+        return 0;
+
+    }
+
+    int count = 0;
+
+    count = countNodes(N -> right) + countNodes(N -> left) + 1;
+    return count;
+
+}
+
+typedef struct listNode {
+
+    int value;
+    struct listNode* next;
+
+} listNode;
+
+listNode* tail(listNode* node) {
+
+    if(node == NULL) {
+
+        return NULL;
+
+    }
+
+    return node -> next;
+
+}
+
+listNode* append(listNode* leftHead, int value, listNode* rightHead) {
+
+    if(leftHead == NULL && rightHead == NULL) {
+
+        listNode* middle = NULL;
+        middle = (listNode*) malloc(sizeof(listNode));
+        middle -> value = value;
+        middle -> next = NULL;
+
+        return middle;
+
+    }
+
+    if (leftHead == NULL) {
+
+        listNode* middle = NULL;
+        middle = (listNode*) malloc(sizeof(listNode));
+        middle -> value = value;
+        middle -> next = rightHead;
+
+        return middle;
+
+    }
+
+    if(value == NULL && rightHead == NULL) {
+
+        return NULL;
+
+    }
+
+    listNode* node = leftHead;
+
+    while(node -> next != NULL) {
+
+        node = node -> next;
+
+    }
+
+    if(leftHead != NULL && rightHead == NULL) {
+
+        listNode* middle = NULL;
+        middle = (listNode*) malloc(sizeof(listNode));
+        middle -> value = value;
+        middle -> next = NULL;
+
+        node -> next = middle;
+
+        return leftHead;
+
+    }
+
+    listNode* middle = NULL;
+    middle = (listNode*) malloc(sizeof(listNode));
+    middle -> value = value;
+    middle -> next = rightHead;
+    node -> next = middle;
+
+    return leftHead;
+
+}
+
+listNode* inOrder(Node* node){
+
+    if (node == NULL) {
+
+        return NULL;
+
+    }
+
+    listNode* leftList = NULL;
+    listNode* rightList = NULL;
+
+    leftList = inOrder(node -> left);
+    rightList = inOrder(node -> right);
+
+    listNode* head = NULL;
+
+    head = append(leftList, node -> value, rightList);
+
+    return head;
+
+}
+
+int getValue(listNode* listNode, int index) {
+
+    if(index == 0) {
+
+        return listNode -> value;
+
+    } else {
+
+        return getValue(tail(listNode), index - 1);
+
+    }
+
+}
+
+Node* buildTree (listNode* listHead, int start, int end) {
+
+    if(start > end) {
+
+        return NULL;
+
+    }
+
+    int middle = (start + end) / 2;
+    int value = getValue(listHead, middle);
+    Node* root = createNode(value);
+
+    root -> left = buildTree(listHead, start, middle - 1);
+    root -> right = buildTree(listHead, middle + 1, end);
+
+    return root;
+
+}
+
+Node* balanceTree(Node* root) {
+
+    int nodeCount = countNodes(root);
+    listNode* listHead = inOrder(root);
+    Node* balancedRoot = buildTree(listHead, 0, nodeCount - 1);
+
+    return balancedRoot;
+
+}
+
+int main() {
 
     Node* myNodes[1001];
     srand(0);
-    Node* root = insertNode(NULL, 500);
+    Node* root = insertNode(NULL, 5);
 
     for(int i = 0; i < 1000; i++) {
 
@@ -259,14 +417,14 @@ void main() {
 
         myNodes[i] =  insertNode(root, r);
 
-
     }
 
+    Node* balancedRoot = balanceTree(root);
     printSubtree(root);
 
-    printf("Depth: %d\n", depth(root, myNodes[40]));
-    printf("Count Leaves: %d\n", countLeaves(root));
-    printSubtree(myNodes[0]);
+//    printf("Depth: %d\n", depth(root, myNodes[40]));
+//    printf("Count Leaves: %d\n", countLeaves(root));
+//    printSubtree(myNodes[0]);
 
 
 }
