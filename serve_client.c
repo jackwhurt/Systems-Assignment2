@@ -55,7 +55,7 @@ char **loadFile(char *fileName, int *length) {
 
         }
 
-        int sLength = strlen(buffer);
+        unsigned long sLength = strlen(buffer);
         char *string = (char *) malloc((sLength + 1) * sizeof(char));
 
         strcpy(string, buffer);
