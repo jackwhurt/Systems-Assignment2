@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "bst.h"
 
+
 //initialising a new node
 Node* createNode(int value) {
 
@@ -33,7 +34,7 @@ Node* insertNode(Node *root, int value) {
 
             Node* newNode = createNode(value);
             root -> left = newNode;
-            return newNode;
+            return root;
 
         } else {
 
@@ -47,7 +48,7 @@ Node* insertNode(Node *root, int value) {
 
             Node* newNode = createNode(value);
             root -> right = newNode;
-            return newNode;
+            return root;
 
         } else {
 
@@ -299,12 +300,6 @@ listNode* append(listNode *leftHead, int value, listNode* rightHead) {
 
     }
 
-    if(value == NULL && rightHead == NULL) {
-
-        return NULL;
-
-    }
-
     listNode* node = leftHead;
 
     while(node -> next != NULL) {
@@ -423,6 +418,34 @@ int sumSubtree(Node *N) {
     return sum;
 
 }
+
+Node* freeSubtree(Node *root) {
+
+    if(root == NULL) {
+
+        return root;
+
+    }
+
+    if(root -> left -> data > root -> data) {
+
+        root -> left = freeSubtree(root);
+
+    } else if(root -> right -> data < root -> data) {
+
+        root -> right = freeSubtree(root);
+
+    } else {
+
+        free(root);
+        return NULL;
+
+    }
+
+    return root;
+
+}
+
 
 int main() {
 
