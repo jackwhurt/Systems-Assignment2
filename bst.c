@@ -5,6 +5,7 @@
 #include "bst.h"
 
 
+
 //initialising a new node
 Node* createNode(int value) {
 
@@ -370,7 +371,7 @@ int getValue(listNode *listNode, int index) {
 }
 
 //builds a balanced tree from an in order linked list of values
-Node* buildTree (listNode *listHead, int start, int end) {
+Node* buildTree(listNode *listHead, int start, int end) {
 
     if(start > end) {
 
@@ -402,15 +403,18 @@ Node* balanceTree(Node *root) {
 
 int sumSubtree(Node *N) {
 
-    listNode *listHead = inOrder(N);
+    listNode *listHead = NULL;
+    listHead = inOrder(N);
     int nodeCount = countNodes(N);
+
+    listNode *currentHead = listHead;
 
     int sum = 0;
 
     for(int i = 0; i < nodeCount; i++) {
 
-        sum += listHead -> value;
-        listHead = tail(listHead);
+        sum += currentHead -> value;
+        currentHead = tail(listHead);
 
     }
 
@@ -446,30 +450,30 @@ Node* freeSubtree(Node *root) {
 
 }
 
-
-int main() {
-
-    Node* myNodes[11];
-    srand(0);
-    Node* root = insertNode(NULL, 5);
-
-    for(int i = 0; i < 12; i++) {
-
-        int r = rand();
-        r = r % 10;
-
-        myNodes[i] =  insertNode(root, r);
-
-    }
-
-    Node* balancedRoot = balanceTree(root);
-    printSubtree(root);
-    printSubtree(balancedRoot);
-    printf("Sum %d\n", sumSubtree(root));
-
-//    printf("Depth: %d\n", depth(root, myNodes[40]));
-//    printf("Count Leaves: %d\n", countLeaves(root));
-//    printSubtree(myNodes[0]);
-
-
-}
+//
+//int main() {
+//
+////    Node* myNodes[11];
+////    srand(0);
+////    Node* root = insertNode(NULL, 5);
+////
+////    for(int i = 0; i < 12; i++) {
+////
+////        int r = rand();
+////        r = r % 10;
+////
+////        myNodes[i] =  insertNode(root, r);
+////
+////    }
+////
+////    Node* balancedRoot = balanceTree(root);
+////    printSubtree(root);
+////    printSubtree(balancedRoot);
+////    printf("Sum %d\n", sumSubtree(root));
+////
+////    printf("Depth: %d\n", depth(root, myNodes[3]));
+////    printf("Count Leaves: %d\n", countLeaves(root));
+////    printSubtree(myNodes[0]);
+//
+//
+//}

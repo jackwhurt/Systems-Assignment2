@@ -1,19 +1,24 @@
 #include<stdio.h>
-#include <string.h>
+#include<stdlib.h>
+#include<string.h>
+#include<unistd.h>
+#include<pthread.h>
+#include "bst.h"
 
-#include "bst.c"
-pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 
-void *downtime(){
+//pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 
-    sleep(1);
-    //TODO: 1st downtime: Do balanceTree here
-
-    sleep(1);
-    //TODO: 2nd downtime: Do balanceTree here
+void *downtime(Node *root){
 
     sleep(1);
-    //TODO: 3rd downtime: Do balanceTree here
+    balanceTree(root);
+
+    sleep(1);
+    balanceTree(root);
+
+    sleep(1);
+    balanceTree(root);
+    printf("\n");
 
     return NULL;
 }
@@ -57,8 +62,6 @@ char **loadFile(char *fileName, int *length) {
         lines[i] = string;
         i++;
 
-        printf(lines[i]);
-
     }
 
     fclose(file);
@@ -69,61 +72,92 @@ char **loadFile(char *fileName, int *length) {
 
 void* ServeClient(char *clientCommands){
 
-    // TODO: Open the fileContent and read commands line by line
+    Node *root = (Node*)malloc(sizeof(struct Node));
+    root -> data = 0;
+    root -> left = NULL;
+    root -> right = NULL;
 
     int length = 0;
     char **commands = 0;
     commands = loadFile(clientCommands, &length);
 
-
     int i = 0;
 
-    while (commands[i] != "\0") {
+    while (i != length) {
 
         if (strstr(commands[i], "insertNode")) {
 
-            char *stringValue = 0;
-            memcpy(stringValue, &commands[i][11], strlen(commands[i]) - 12);
+            unsigned long strLength = strlen(commands[i]);
+            char *command = commands[i];
+            char stringValue[strLength - 11];
+
+            memcpy(stringValue, &command[11], strLength - 11);
+            stringValue[strLength - 11] = '\0';
             int value = atoi(stringValue);
 
-            Node *node = createNode(value);
-            insertNode(node, value);
+            insertNode(root, value);
+
+            printf("[%s]%s\n", clientCommands, commands[i]);
+
+            // print: "[ClientName]insertNode <SomeNumber>\n"
+            // e.g. "[client1_commands]insertNode 1\n"
+
 
         } else if (strstr(commands[i], "deleteNode")) {
+
+            unsigned long strLength = strlen(commands[i]);
+            char *command = commands[i];
+            char stringValue[strLength - 11];
+
+            memcpy(stringValue, &command[11], strLength - 11);
+            stringValue[strLength - 11] = '\0';
+            int value = atoi(stringValue);
+
+            deleteNode(root, value);
+
+            printf("[%s]%s\n", clientCommands, commands[i]);
+
+            // print: "[ClientName]deleteNode <SomeNumber>\n"
+            // e.g. "[client1_commands]deleteNode 1\n"
 
 
         } else if (strstr(commands[i], "countNodes")) {
 
+            // print: "[ClientName]countNodes = <SomeNumber>\n"
+            // e.g. "[client1_commands]countNodes 1\n"
+
+            int count = countNodes(root);
+
+            printf("[%s]%s = %d\n", clientCommands, commands[i], count);
+
 
         } else if (strstr(commands[i], "sumSubtree")) {
+
+            // print: "[ClientName]sumSubtree = <SomeNumber>\n"
+            // e.g. "[client1_commands]sumSubtree 1\n"
+
+            int sum = sumSubtree(root);
+
+            printf("[%s]%s = %d\n", clientCommands, commands[i], sum);
 
 
         }
 
+        i++;
+
 
     }
 
-
-
-    // TODO: match and execute commands
-
-    // TODO: Handle command: "insertNode <some unsigned int value>"
-    // print: "[ClientName]insertNode <SomeNumber>\n"
-    // e.g. "[client1_commands]insertNode 1\n"
-
-    // TODO: Handle command: "deleteNode <some unsigned int value>"
-    // print: "[ClientName]deleteNode <SomeNumber>\n"
-    // e.g. "[client1_commands]deleteNode 1\n"
-
-    // TODO: Handle command: "countNodes"
-    // print: "[ClientName]countNodes = <SomeNumber>\n"
-    // e.g. "[client1_commands]countNodes 1\n"
-
-
-    // TODO: Handle command: "sumSubtree"
-    // print: "[ClientName]sumSubtree = <SomeNumber>\n"
-    // e.g. "[client1_commands]sumSubtree 1\n"
-
-
+    free(commands);
+    free(root);
     return NULL;
+}
+
+
+int main() {
+
+    ServeClient("/Users/jackhurt/Desktop/Uni/CS/Year2/C/Systems-Assignment2/client1_commands");
+
+
+
 }
