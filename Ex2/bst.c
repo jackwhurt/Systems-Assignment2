@@ -65,7 +65,7 @@ int isPresent(Node *root, int value) {
     }
 
 }
-//TODO: delete wrong dunnno why bruh
+
 Node * deleteNode(Node * root, int value) {
    
 	if(root == NULL) {
