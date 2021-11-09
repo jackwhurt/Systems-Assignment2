@@ -5,7 +5,7 @@ pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 
 void *downtime(){
 
-	//each night time, lock the rw lock, balance the tree and free the old unbalanced tree
+	//each night-time, lock the rw lock, balance the tree and free the old unbalanced tree
 	sleep(1);
 	pthread_rwlock_wrlock(&lock);
 	Node *temp = root;
@@ -51,7 +51,7 @@ char **loadFile(char *fileName, int *length) {
     char buffer[1000];
     int i = 0;
 
-	//fgets loads each line of the file into a buffer of lenght 1000
+	//fgets loads each line of the file into a buffer of length 1000
     while(fgets(buffer, 1000, file)) {
 
 		//dynamically increase the size of the lines array if the file has more lines than it has elements
