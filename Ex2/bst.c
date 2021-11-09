@@ -2,14 +2,15 @@
 #include<stdlib.h>
 #include<string.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "bst.h"
-
-
 
 //initialising a new node
 Node* createNode(int value) {
 
-    Node* newNode = (Node*)malloc(sizeof(struct Node));
+    Node *newNode = NULL;
+    newNode = (Node*)malloc(sizeof(struct Node));
     newNode -> data = value;
     newNode -> left = NULL;
     newNode -> right = NULL;
@@ -31,36 +32,16 @@ Node* insertNode(Node *root, int value) {
     //recur down the tree until a node is found which has empty left or right pointers
     if(root -> data > value) {
 
-        if(root -> left == NULL) {
+        root -> left = insertNode(root -> left, value);
 
-            Node* newNode = createNode(value);
-            root -> left = newNode;
-            return root;
+    } else if(root -> data < value) {
 
-        } else {
-
-            return(insertNode(root -> left, value));
-
-        }
-
-    }else if(root -> data < value) {
-
-        if(root -> right == NULL) {
-
-            Node* newNode = createNode(value);
-            root -> right = newNode;
-            return root;
-
-        } else {
-
-            return(insertNode(root -> right, value));
-
-        }
-
+        root -> right = insertNode(root -> right, value);
+     
     }
 
-    //if the data already exists return null
-    return NULL;
+    //if the data already exists return the root
+    return root;
 
 }
 
@@ -72,7 +53,7 @@ int isPresent(Node *root, int value) {
         return 0;
 
     }
-
+	
     if(root -> data == value) {
 
         return 1;
@@ -85,64 +66,75 @@ int isPresent(Node *root, int value) {
 
 }
 
-Node* deleteNode(Node *root, int value) {
+Node * deleteNode(Node * root, int value) {
+   
+	if(root == NULL) {
 
-    if(root == NULL) {
-
-        return NULL;
-
-    }
-
-    //recur down the tree until the data is found making sure to check there aren't any null pointers
-    if(root -> data > value) {
-
-        root -> left = deleteNode(root -> left, value);
-
-    } else if(root -> data < value) {
-
-        root -> right = deleteNode(root -> right, value);
-
-    } else {
-
-        //if it has none or one, just set the parent (of the node to delete) pointer to the child (of node to delete)
-        if(root -> right == NULL) {
-
-            Node* newNode = root -> left;
-            free(root);
-            return newNode;
-
-        } else if(root -> left == NULL) {
-
-            Node* newNode = root -> right;
-            free(root);
-            return newNode;
-
-        }
-
-        //if it has two, replace the node to delete with the smallest data on its right subtree
-        Node* newNode = root -> right;
-
-        do {
-
-            if(newNode -> left != NULL) {
-
-                newNode = newNode -> left;
-
-            }
-
-        } while(newNode -> left != NULL);
-
-        root -> data = newNode -> data;
-        root -> right = deleteNode(root -> right, root -> data);
+        return root;
 
     }
+	
+	if(root -> data == value && root -> left == NULL && root -> right == NULL) {
 
-    return root;
+		free(root);
+		return NULL;
+
+	}
+
+	//if the root value is less than the root value traverse left of the tree, if more than traverse right
+	if(value < root -> data) {
+
+		root -> left = deleteNode(root -> left, value);
+
+	} else if(value > root -> data) {
+
+		root -> right = deleteNode(root -> right, value);
+
+	} else {
+
+		//if the root value is equal to the value to delete with less than two children, replace it with its child or null respectively
+		if(root -> left == NULL) {
+			
+			struct Node *temp = root -> right;
+			free(root);
+			return temp;
+
+		} else if(root -> right == NULL) {
+
+			struct Node *temp = root -> left;
+			free(root);
+			return temp;
+
+		}
+
+		//if it has two children find the largest value on its right subtree to replace the data with
+		struct Node *current = root -> right;
+
+		while (current && current -> left != NULL) {
+			
+			current = current -> left;
+
+		}
+		
+		//delete the now duplicate node
+		root -> data = current -> data;
+
+		root -> right = deleteNode(root -> right, current -> data);
+
+	}
+	
+  	return root;
 
 }
 
 //recur through the tree starting on the left and print the values in the left, root, right order
 void printSubtree(Node *N) {
+
+	if(N == NULL) {
+
+		return;
+
+	}
 
     if(N -> left != NULL) {
 
@@ -180,33 +172,22 @@ int countLeaves(Node *N) {
 
 }
 
-//find the root data to delete and just free it from memory
-Node* deleteSubtree(Node *root, int value) {
+Node* freeSubtree(Node *root) {
 
     if(root == NULL) {
 
-        return root;
+	return NULL;
 
     }
 
-    if(root -> data > value) {
+    freeSubtree(root -> left);
+    freeSubtree(root -> right);
 
-        root -> left = deleteSubtree(root -> left, value);
+    free(root);
+    
+    return NULL;
 
-    } else if(root -> data < value) {
-
-        root -> right = deleteSubtree(root -> right, value);
-
-    } else {
-
-        free(root);
-        return NULL;
-
-    }
-
-    return root;
-
-}
+} 
 
 //first find the wanted node and each time it goes down a level of the tree, increment depthCount, when found just
 //return depthCount
@@ -276,13 +257,28 @@ listNode* tail(listNode *node) {
 
 }
 
+void freeList(listNode *listHead) {
+
+    listNode *tempNode = NULL;
+
+    while(listHead != NULL) {
+
+	tempNode = listHead;
+	listHead = listHead -> next;
+	free(tempNode);
+
+    }
+
+}
+
+
 //function to join together left, root and right
 listNode* append(listNode *leftHead, int value, listNode* rightHead) {
 
     if(leftHead == NULL && rightHead == NULL) {
 
         listNode *middle = NULL;
-        middle = (listNode*) malloc(sizeof(listNode));
+        middle = (listNode*) malloc(sizeof(struct listNode));
         middle -> value = value;
         middle -> next = NULL;
 
@@ -293,7 +289,7 @@ listNode* append(listNode *leftHead, int value, listNode* rightHead) {
     if (leftHead == NULL) {
 
         listNode *middle = NULL;
-        middle = (listNode*) malloc(sizeof(listNode));
+        middle = (listNode*) malloc(sizeof(struct listNode));
         middle -> value = value;
         middle -> next = rightHead;
 
@@ -348,7 +344,6 @@ listNode* inOrder(Node *node){
     rightList = inOrder(node -> right);
 
     listNode *head = NULL;
-
     head = append(leftList, node -> data, rightList);
 
     return head;
@@ -394,86 +389,39 @@ Node* buildTree(listNode *listHead, int start, int end) {
 Node* balanceTree(Node *root) {
 
     int nodeCount = countNodes(root);
-    listNode *listHead = inOrder(root);
+    listNode *listHead = inOrder(root);   
     Node *balancedRoot = buildTree(listHead, 0, nodeCount - 1);
-
+    
+    freeList(listHead);
+    
     return balancedRoot;
 
 }
 
-int sumSubtree(Node *N) {
+//to sum the subtree convert it into a linked list and then iterate through
+int sumSubtree(Node *N)
+{
 
     listNode *listHead = NULL;
     listHead = inOrder(N);
     int nodeCount = countNodes(N);
 
-    listNode *currentHead = listHead;
-
     int sum = 0;
 
     for(int i = 0; i < nodeCount; i++) {
 
-        sum += currentHead -> value;
-        currentHead = tail(listHead);
+        sum += listHead -> value;
+        listNode *tempNode = listHead;
+        listHead = tail(listHead);
+        free(tempNode);
 
     }
 
-    free(listHead);
     return sum;
 
 }
 
-Node* freeSubtree(Node *root) {
 
-    if(root == NULL) {
 
-        return root;
 
-    }
 
-    if(root -> left -> data > root -> data) {
-
-        root -> left = freeSubtree(root);
-
-    } else if(root -> right -> data < root -> data) {
-
-        root -> right = freeSubtree(root);
-
-    } else {
-
-        free(root);
-        return NULL;
-
-    }
-
-    return root;
-
-}
-
-//
-//int main() {
-//
-////    Node* myNodes[11];
-////    srand(0);
-////    Node* root = insertNode(NULL, 5);
-////
-////    for(int i = 0; i < 12; i++) {
-////
-////        int r = rand();
-////        r = r % 10;
-////
-////        myNodes[i] =  insertNode(root, r);
-////
-////    }
-////
-////    Node* balancedRoot = balanceTree(root);
-////    printSubtree(root);
-////    printSubtree(balancedRoot);
-////    printf("Sum %d\n", sumSubtree(root));
-////
-////    printf("Depth: %d\n", depth(root, myNodes[3]));
-////    printf("Count Leaves: %d\n", countLeaves(root));
-////    printSubtree(myNodes[0]);
-//
-//
-//}
